@@ -66,7 +66,9 @@ router.post(
           expiresIn: 36000
         },
         (err, token) => {
-          if (err) throw err;
+          if (err) {
+            throw err;
+          }
           res.json({ token });
         }
       );
@@ -74,8 +76,6 @@ router.post(
       console.error(err.message);
       res.status(500).send("Server Error");
     }
-
-    res.send("User route");
   }
 );
 
