@@ -214,26 +214,26 @@ router.put(
   }
 );
 
-//delete experience from profile - private
 router.delete("/experience/:exp_id", auth, async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id });
 
-    //need better solution than checking the lenght of the array
-    if (profile.experience.length < 1) {
-      return res.status(400).json({ msg: "Invalid ID" });
+    //is there a better solution? -removed object conversion to string. not good in loop. Cannot parse req.params.exp_id to json, which could be stored in a variable outside of loop if it could parse
+    for (let i = 0; i < profile.experience.length; i++) {
+      if (profile.experience[i]._id == req.params.exp_id) {
+        const removeIndex = profile.experience
+          .map(item => item.id)
+          .indexOf(req.params.exp_id);
+
+        profile.experience.splice(removeIndex, 1);
+
+        await profile.save();
+
+        return res.json(profile);
+      }
     }
 
-    //get remove index
-    const removeIndex = profile.experience
-      .map(item => item.id)
-      .indexOf(req.params.exp_id);
-
-    profile.experience.splice(removeIndex, 1);
-
-    await profile.save();
-
-    res.json(profile);
+    return res.status(400).json({ msg: "Invalid ID" });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
@@ -302,22 +302,23 @@ router.put(
 router.delete("/education/:edu_id", auth, async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id });
-    //get remove index
-    //bug removes with invalid id. Need check for id
-    //need better solution than checking the lenght of the array
-    if (profile.education.length < 1) {
-      return res.status(400).json({ msg: "Invalid ID" });
+
+    //is there a better solution? -decided not to convert object to string inside of loop to match types
+    for (let i = 0; i < profile.education.length; i++) {
+      if (profile.education[i]._id == req.params.edu_id) {
+        const removeIndex = profile.education
+          .map(item => item.id)
+          .indexOf(req.params.edu_id);
+
+        profile.education.splice(removeIndex, 1);
+
+        await profile.save();
+
+        return res.json(profile);
+      }
     }
 
-    const removeIndex = profile.education
-      .map(item => item.id)
-      .indexOf(req.params.edu_id);
-
-    profile.education.splice(removeIndex, 1);
-
-    await profile.save();
-
-    res.json(profile);
+    return res.status(400).json({ msg: "Invalid ID" });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
