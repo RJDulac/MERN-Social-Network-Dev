@@ -10,12 +10,14 @@ const User = require("../../models/Users");
 //function for checking ids to be deleted
 const matchIDs = (objID, strID) => {
   for (let i = 0; i < objID.length; i++) {
+    console.log(objID[i]._id);
     if (objID[i]._id == strID) {
       return true;
     }
-    return false;
   }
+  return false;
 };
+
 //get current user's profile - private
 router.get("/me", auth, async (req, res) => {
   try {
@@ -224,28 +226,6 @@ router.put(
   }
 );
 
-// router.delete("/experience/:exp_id", auth, async (req, res) => {
-//   try {
-//     const profile = await Profile.findOne({ user: req.user.id });
-
-//     if (matchIDs(profile.experience, req.params.exp_id)) {
-//       const removeIndex = profile.experience
-//         .map(item => item.id)
-//         .indexOf(req.params.exp_id);
-
-//       profile.experience.splice(removeIndex, 1);
-
-//       await profile.save();
-
-//       return res.json(profile);
-//     }
-
-//     return res.status(400).json({ msg: "Invalid ID" });
-//   } catch (err) {
-//     console.error(err.message);
-//     res.status(500).send("Server Error");
-//   }
-// });
 router.delete("/experience/:exp_id", auth, async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id });
