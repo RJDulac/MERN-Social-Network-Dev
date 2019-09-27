@@ -6,6 +6,16 @@ const auth = require("../../middleware/auth");
 const Profile = require("../../models/Profile");
 const User = require("../../models/Users");
 
+//maybe put this function in a utils fold/file
+//function for checking ids to be deleted
+const matchIDs = (objID, strID) => {
+  for (let i = 0; i < objID.length; i++) {
+    if (objID[i]._id == strID) {
+      return true;
+    }
+    return false;
+  }
+};
 //get current user's profile - private
 router.get("/me", auth, async (req, res) => {
   try {
@@ -214,23 +224,42 @@ router.put(
   }
 );
 
+// router.delete("/experience/:exp_id", auth, async (req, res) => {
+//   try {
+//     const profile = await Profile.findOne({ user: req.user.id });
+
+//     if (matchIDs(profile.experience, req.params.exp_id)) {
+//       const removeIndex = profile.experience
+//         .map(item => item.id)
+//         .indexOf(req.params.exp_id);
+
+//       profile.experience.splice(removeIndex, 1);
+
+//       await profile.save();
+
+//       return res.json(profile);
+//     }
+
+//     return res.status(400).json({ msg: "Invalid ID" });
+//   } catch (err) {
+//     console.error(err.message);
+//     res.status(500).send("Server Error");
+//   }
+// });
 router.delete("/experience/:exp_id", auth, async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id });
 
-    //is there a better solution? -removed object conversion to string. not good in loop. Cannot parse req.params.exp_id to json, which could be stored in a variable outside of loop if it could parse
-    for (let i = 0; i < profile.experience.length; i++) {
-      if (profile.experience[i]._id == req.params.exp_id) {
-        const removeIndex = profile.experience
-          .map(item => item.id)
-          .indexOf(req.params.exp_id);
+    if (matchIDs(profile.experience, req.params.exp_id)) {
+      const removeIndex = profile.experience
+        .map(item => item.id)
+        .indexOf(req.params.exp_id);
 
-        profile.experience.splice(removeIndex, 1);
+      profile.experience.splice(removeIndex, 1);
 
-        await profile.save();
+      await profile.save();
 
-        return res.json(profile);
-      }
+      return res.json(profile);
     }
 
     return res.status(400).json({ msg: "Invalid ID" });
@@ -303,19 +332,16 @@ router.delete("/education/:edu_id", auth, async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id });
 
-    //is there a better solution? -decided not to convert object to string inside of loop to match types
-    for (let i = 0; i < profile.education.length; i++) {
-      if (profile.education[i]._id == req.params.edu_id) {
-        const removeIndex = profile.education
-          .map(item => item.id)
-          .indexOf(req.params.edu_id);
+    if (matchIDs(profile.education, req.params.edu_id)) {
+      const removeIndex = profile.education
+        .map(item => item.id)
+        .indexOf(req.params.edu_id);
 
-        profile.education.splice(removeIndex, 1);
+      profile.education.splice(removeIndex, 1);
 
-        await profile.save();
+      await profile.save();
 
-        return res.json(profile);
-      }
+      return res.json(profile);
     }
 
     return res.status(400).json({ msg: "Invalid ID" });
